@@ -37,7 +37,7 @@ def init():
                   ' ( paper_name varchar(100) , ' \
                    'importance integer, urgency integer, ' \
                    'tags varchar(100), path varchar(100), ' \
-                   'read integer, date TEXT, ' \
+                   'read varchar(10), date TEXT, ' \
                    'id integer primary key autoincrement)'
     cursor.execute(sql_create)
 
@@ -165,6 +165,22 @@ def query_by_tags(tags_s):
         print color.red("find nothing !")
 
 
+def query_path_by_nums(num_s):
+    results = []
+    nums = num_s.strip().split(' ')
+    if len(nums) > 0:
+        for num in nums:
+            recs = cursor.execute("select * from papers where id=? ", (num,)).fetchall()
+            if len(recs) > 0:
+                for rec in recs:
+                    results.append(rec[4])
+    if len(results) > 0:
+        for res in results:
+            print res
+    else:
+        print color.red("find nothing !")
+
+
 def query_by_nums(num_s):
     """search papers by id nums"""
     results = []
@@ -193,6 +209,15 @@ def edit_one_paper(id_num):
     papers = query_by_id(id_num)
     if len(papers) > 0:
         paper_im, paper_ug, paper_tags, read = get_on_paper_info_from_user()
+        # if user only press enter,  save the old value
+        if paper_im == '':
+            paper_im = papers[0][1]
+        if paper_ug == '':
+            paper_ug = papers[0][2]
+        if paper_tags == '':
+            paper_tags = papers[0][3]
+        if read == '':
+            paper_ug = papers[0][5]
         update_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
     else:
         print color.red("paper id num equals {} dose not exist!".format(id_num))
@@ -236,6 +261,7 @@ tags  show all tags
 sbt   search by tags, like (sbt tag1 tg2)
 sbn   search by id nums, like (sbn 1 2)
 edit  edit one paper info by paper id, like (edit 1)
+path find path by paper id, like (path 1 2)
 help  help info
 quit  exit the manager
             '''
@@ -277,6 +303,12 @@ quit  exit the manager
     def help_edit(self):
         print "edit one paper info by paper id, like (edit 1),\n" \
               "use 'all' or 'tags' to see the id of your paper."
+
+    def do_path(self, arg):
+        query_path_by_nums(arg)
+
+    def help_path(self):
+        print "find path by paper id, like (path 1 2)"
 
     def do_quit(self, arg):
         print color.yellow("Bye ...")

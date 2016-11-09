@@ -3,4 +3,4 @@
 *.pkl
 test.*
 *.db
-×_test.py
+*_test.py
