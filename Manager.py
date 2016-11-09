@@ -1,7 +1,5 @@
 # coding=utf-8
 import os
-from Paper import Paper
-from Paper import paper_item_list
 from Color import Colored
 import cPickle as Pkl
 import sqlite3
@@ -11,6 +9,9 @@ import cmd
 
 color = Colored()
 pkl_name = "user_set.pkl"
+paper_item_list = ['paper_name', 'importance',
+                   'urgency', 'tags', 'path',
+                   'read', 'date', 'id']
 
 def init():
     global paper_path
