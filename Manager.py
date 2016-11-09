@@ -6,6 +6,7 @@ from Color import Colored
 import cPickle as Pkl
 import sqlite3
 from datetime import date
+import cmd
 
 
 color = Colored()
@@ -145,16 +146,38 @@ def show_tags():
 
 
 def query_by_tags(tags_s):
-    """search papers by tag"""
-    results = []
+    """search papers by tags"""
+    sets = []
     tags = tags_s.strip().split(' ')
-    if len(tags)>0:
+    if len(tags) > 0:
         for tag in tags:
             recs = cursor.execute("select * from papers where tags like '%{}%'".format(tag)).fetchall()
             if len(recs) > 0:
+                res_set = set()
+                for rec in recs:
+                    res_set.add(rec)
+                sets.append(res_set)
+    results = reduce(lambda x, y: x & y, sets)
+    if len(results) > 0:
+        print_papers(results)
+    else:
+        print color.red("find nothing !")
+
+
+def query_by_nums(num_s):
+    """search papers by id nums"""
+    results = []
+    nums = num_s.strip().split(' ')
+    if len(nums) > 0:
+        for num in nums:
+            recs = cursor.execute("select * from papers where id=? ", (num,)).fetchall()
+            if len(recs) > 0:
                 for rec in recs:
                     results.append(rec)
-    print_papers(results)
+    if len(results) > 0:
+        print_papers(results)
+    else:
+        print color.red("find nothing !")
 
 
 def query_by_id(id_num):
@@ -167,10 +190,11 @@ def query_by_id(id_num):
 
 def edit_one_paper(id_num):
     papers = query_by_id(id_num)
-    paper_im, paper_ug, paper_tags, read = get_on_paper_info_from_user()
-    # del_by_names([papers[0][0]])
-    # insert_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
-    update_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
+    if len(papers) > 0:
+        paper_im, paper_ug, paper_tags, read = get_on_paper_info_from_user()
+        update_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
+    else:
+        print color.red("paper id num equals {} dose not exist!".format(id_num))
 
 
 def get_on_paper_info_from_user():
@@ -195,15 +219,76 @@ def quit_manager():
     conn.commit()
     conn.close()
 
+
+class MyCmd(cmd.Cmd):
+    """my command processor"""
+
+    def __init__(self):
+        cmd.Cmd.__init__(self)
+        self.prompt = '(manager)>'
+        self.intro = '''
+Paper Manager Usage：
+^---^ ^---^ ^---^ ^---^ ^---^
+rec   recommend the papers according to urgency and importance
+all   show all the papers info
+tags  show all tags
+sbt   search by tags, like (sbt tag1 tg2)
+sbn   search by id nums, like (sbn 1 2)
+edit  edit one paper info by paper id, like (edit 1)
+help  help info
+quit  exit the manager
+            '''
+
+    def do_rec(self, arg):
+        recommend_papers()
+
+    def help_rec(self):
+        print "recommend the papers according to urgency and importance"
+
+    def do_all(self, arg):
+        recs = cursor.execute("SELECT * from papers ").fetchall()
+        print_papers(recs)
+
+    def help_all(self):
+        print "show all the papers info"
+
+    def do_tags(self, arg):
+        show_tags()
+
+    def help_tags(self):
+        print "show all tags"
+
+    def do_sbt(self, arg):
+        query_by_tags(arg)
+
+    def help_sbt(self):
+        print "search by tags, like (sbt tag1 tg2)"
+
+    def do_sbn(self, arg):
+        query_by_nums(arg)
+
+    def help_sbn(self):
+        print "search by id nums, like (sbn 1 2)"
+
+    def do_edit(self, arg):
+        edit_one_paper(arg)
+
+    def help_edit(self):
+        print "edit one paper info by paper id, like (edit 1),\n" \
+              "use 'all' or 'tags' to see the id of your paper."
+
+    def do_quit(self, arg):
+        print color.yellow("Bye ...")
+        quit_manager()
+        import sys
+        sys.exit()
+
+    def help_quit(self):
+        print 'exit the manager'
+
 if __name__ == '__main__':
     init()
     refresh()
-    # show_tags()
-    # tags_s = raw_input("input tags to search papers (spilt by space):")
-    # query_by_tags(tags_s)
-    # id_num = raw_input("input the id of the paper: ")
-    # edit_one_paper(id_num)
-    # recs = cursor.execute("SELECT * from papers ").fetchall()
-    # print_papers(recs)
-    recommend_papers()
-    quit_manager()
+    mycmd = MyCmd()
+    mycmd.cmdloop()
+
