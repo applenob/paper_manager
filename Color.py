@@ -59,3 +59,4 @@ if __name__ == '__main__':
     print color.cyan('I am cyan!')
     print color.white('I am white!')
     print color.white_green('I am white green!')
+    print color.white('I am white!') + color.magenta('I am magenta!')

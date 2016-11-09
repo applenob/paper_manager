@@ -2,3 +2,5 @@
 *.pyc
 *.pkl
 test.*
+*.db
+×_test.py
