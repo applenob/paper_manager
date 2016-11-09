@@ -7,6 +7,7 @@ import cPickle as Pkl
 import sqlite3
 from datetime import date
 
+
 color = Colored()
 pkl_name = "user_set.pkl"
 
@@ -86,11 +87,32 @@ def insert_one(paper_name, paper_im, paper_ug, paper_tags, read):
 
 
 def print_papers(recs):
-    for rec in recs:
-        print color.cyan("title: "+rec[0]) + color.magenta(" importance: "+str(rec[1])) \
-              + color.red(" urgency: "+str(rec[2])) + color.blue(" tags: "+rec[3]) \
-              + color.green(" path: "+rec[4]) + color.yellow(" read: "+str(rec[5])) \
-              + color.white(" date: "+rec[6])
+    from terminaltables import DoubleTable
+    recs_head = ['paper_name', 'importance',
+                   'urgency', 'tags',
+                   'read', 'date']
+    recs_t = [prettify_one(rec) for rec in recs]
+    recs_t.insert(0, recs_head)
+    table = DoubleTable(recs_t)
+    print table.table
+
+
+def prettify_one(rec):
+    # one_row = [color.cyan("title: " + rec[0]),
+    #            color.magenta(" importance: " + str(rec[1])),
+    #            color.red(" urgency: " + str(rec[2])),
+    #            color.blue(" tags: " + rec[3]),
+    #            color.green(" path: " + rec[4]),
+    #            color.yellow(" read: " + str(rec[5])),
+    #            color.white(" date: " + rec[6])]
+    one_row = [color.cyan(rec[0]),
+               color.magenta(str(rec[1])),
+               color.red(str(rec[2])),
+               color.blue(rec[3]),
+               color.yellow(str(rec[5])),
+               color.green(rec[6])]
+    one_row = [item.decode('utf-8') for item in one_row]
+    return one_row
 
 
 def traverse_papers(fa_path):
