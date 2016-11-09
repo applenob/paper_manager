@@ -9,6 +9,9 @@
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
+colors = ['red', 'green', 'yellow',
+          'blue', 'magenta', 'cyan',
+          'white']
 
 
 class Colored(object):
@@ -49,6 +52,18 @@ class Colored(object):
         #  前景色:白色  背景色:绿色
         return Fore.WHITE + Back.GREEN + s + Fore.RESET + Back.RESET
 
+    def yellow_blue(self, s):
+        #  前景色:黄色  背景色:蓝色
+        return Fore.YELLOW + Back.BLUE + s + Fore.RESET + Back.RESET
+
+    def blue_yellow(self, s):
+        #  前景色:蓝色  背景色:黄色
+        return Fore.BLUE + Back.YELLOW + s + Fore.RESET + Back.RESET
+
+    def paint(self, color, string):
+        # paint by color
+        return eval("self.{}('{}')".format(color, string))
+
 if __name__ == '__main__':
     color = Colored()
     print color.red('I am red!')
@@ -60,3 +75,4 @@ if __name__ == '__main__':
     print color.white('I am white!')
     print color.white_green('I am white green!')
     print color.white('I am white!') + color.magenta('I am magenta!')
+    print color.paint('cyan','I am white green!')

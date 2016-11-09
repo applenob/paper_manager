@@ -32,10 +32,11 @@ def init():
     conn.text_factory = str
     cursor = conn.cursor()
     sql_create = 'create table if not exists papers' \
-                 + ' (paper_name varchar(20) primary key, ' \
-                   'importance integer, urgency integer,' \
+                  ' ( paper_name varchar(100) , ' \
+                   'importance integer, urgency integer, ' \
                    'tags varchar(100), path varchar(100), ' \
-                   'read integer, date TEXT)'
+                   'read integer, date TEXT, ' \
+                   'id integer primary key autoincrement)'
     cursor.execute(sql_create)
 
 
@@ -61,21 +62,14 @@ def refresh():
         # find a new paper, put in infos
         if now_paper not in old_paper_names:
             print color.cyan("Find a new paper: {}".format(now_paper))
-            paper_im = raw_input(color.red("Please input the importance of this "
-                                           "paper (from 1 to 5):"))
-            paper_ug = raw_input(color.yellow("Please input the urgency of this "
-                                              "paper (from 1 to 5):"))
-            paper_tags = raw_input(color.blue("Please input the tags of this paper"
-                                              " (split by space):"))
-            read = raw_input(color.magenta("Is this paper has been read?"
-                                           " (y/n): "))
-            print
+            paper_im, paper_ug, paper_tags, read = get_on_paper_info_from_user()
             insert_one(now_paper, paper_im, paper_ug, paper_tags, read)
 
 
 def del_by_names(names):
     for name in names:
         cursor.execute("DELETE FROM papers WHERE paper_name = ?", (name,))
+    conn.commit()
 
 
 def insert_one(paper_name, paper_im, paper_ug, paper_tags, read):
@@ -86,11 +80,19 @@ def insert_one(paper_name, paper_im, paper_ug, paper_tags, read):
     conn.commit()
 
 
+def update_one(paper_name, paper_im, paper_ug, paper_tags, read):
+    cursor.execute("UPDATE papers set importance=?, urgency=?, "
+                   "tags=?, path=?, read=?, date=? where paper_name=?",
+                   (paper_im, paper_ug, paper_tags, papers_name_now[paper_name],
+                    read, str(date.today()), paper_name))
+    conn.commit()
+
+
 def print_papers(recs):
     from terminaltables import DoubleTable
-    recs_head = ['paper_name', 'importance',
-                   'urgency', 'tags',
-                   'read', 'date']
+    recs_head = ['id', 'paper_name',
+                 'importance', 'urgency', 'tags',
+                 'read', 'date']
     recs_t = [prettify_one(rec) for rec in recs]
     recs_t.insert(0, recs_head)
     table = DoubleTable(recs_t)
@@ -98,14 +100,8 @@ def print_papers(recs):
 
 
 def prettify_one(rec):
-    # one_row = [color.cyan("title: " + rec[0]),
-    #            color.magenta(" importance: " + str(rec[1])),
-    #            color.red(" urgency: " + str(rec[2])),
-    #            color.blue(" tags: " + rec[3]),
-    #            color.green(" path: " + rec[4]),
-    #            color.yellow(" read: " + str(rec[5])),
-    #            color.white(" date: " + rec[6])]
-    one_row = [color.cyan(rec[0]),
+    one_row = [color.blue_yellow(str(rec[7])),
+               color.cyan(rec[0]),
                color.magenta(str(rec[1])),
                color.red(str(rec[2])),
                color.blue(rec[3]),
@@ -127,7 +123,67 @@ def traverse_papers(fa_path):
 
 def recommend_papers():
     """select papers i can read for the sake of importance and urgency"""
-    pass
+    rec_papers = cursor.execute("SELECT * from papers where importance!='' and urgency!='' and read='n' ORDER BY urgency DESC , importance DESC LIMIT 5 ").fetchall()
+    if len(rec_papers) > 0:
+        print_papers(rec_papers)
+
+
+def show_tags():
+    """show all tags of my papers"""
+    tags = cursor.execute("SELECT tags from papers").fetchall()
+    tags = [tag[0] for tag in tags]
+    tag_set = set()
+    for line in tags:
+        for tag in line.strip().split(' '):
+            if tag.strip() != '':
+                tag_set.add(tag)
+    from Color import colors
+    tag_s = 'All Tags: \n'
+    for i, tag in enumerate(tag_set):
+        tag_s += color.paint(colors[i % len(colors)], tag) + ' '
+    print tag_s
+
+
+def query_by_tags(tags_s):
+    """search papers by tag"""
+    results = []
+    tags = tags_s.strip().split(' ')
+    if len(tags)>0:
+        for tag in tags:
+            recs = cursor.execute("select * from papers where tags like '%{}%'".format(tag)).fetchall()
+            if len(recs) > 0:
+                for rec in recs:
+                    results.append(rec)
+    print_papers(results)
+
+
+def query_by_id(id_num):
+    papers = cursor.execute("select * from papers where id=?", (id_num,)).fetchall()
+    if len(papers) == 1:
+        print color.cyan("find the paper:")
+        print_papers(papers)
+    return papers
+
+
+def edit_one_paper(id_num):
+    papers = query_by_id(id_num)
+    paper_im, paper_ug, paper_tags, read = get_on_paper_info_from_user()
+    # del_by_names([papers[0][0]])
+    # insert_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
+    update_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
+
+
+def get_on_paper_info_from_user():
+    paper_im = raw_input(color.red("Please input the importance of this "
+                                   "paper (from 1 to 5):"))
+    paper_ug = raw_input(color.yellow("Please input the urgency of this "
+                                      "paper (from 1 to 5):"))
+    paper_tags = raw_input(color.blue("Please input the tags of this paper"
+                                      " (split by space):"))
+    read = raw_input(color.magenta("Is this paper has been read?"
+                                   " (y/n): "))
+    print
+    return paper_im, paper_ug, paper_tags, read
 
 
 def quit_manager():
@@ -142,6 +198,12 @@ def quit_manager():
 if __name__ == '__main__':
     init()
     refresh()
-    recs = cursor.execute("SELECT * from papers ").fetchall()
-    print_papers(recs)
+    # show_tags()
+    # tags_s = raw_input("input tags to search papers (spilt by space):")
+    # query_by_tags(tags_s)
+    # id_num = raw_input("input the id of the paper: ")
+    # edit_one_paper(id_num)
+    # recs = cursor.execute("SELECT * from papers ").fetchall()
+    # print_papers(recs)
+    recommend_papers()
     quit_manager()

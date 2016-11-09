@@ -2,7 +2,7 @@
 
 paper_item_list = ['paper_name', 'importance',
                    'urgency', 'tags', 'path',
-                   'read', 'date']
+                   'read', 'date', 'id']
 
 
 class Paper:
