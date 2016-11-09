@@ -13,6 +13,7 @@ paper_item_list = ['paper_name', 'importance',
                    'urgency', 'tags', 'path',
                    'read', 'date', 'id']
 
+
 def init():
     global paper_path
     global user_set
@@ -261,7 +262,7 @@ tags  show all tags
 sbt   search by tags, like (sbt tag1 tg2)
 sbn   search by id nums, like (sbn 1 2)
 edit  edit one paper info by paper id, like (edit 1)
-path find path by paper id, like (path 1 2)
+path  find path by paper id, like (path 1 2)
 help  help info
 quit  exit the manager
             '''

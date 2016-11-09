@@ -1,6 +1,7 @@
 # Paper Manager
 ##  1.Intro
 A command-line manager programed in python, help with managing your local academic papers.
+[Chinese blog address](http://www.jianshu.com/p/768db1472042)
 ## 2.Usage
  ```
  python Manager.py
