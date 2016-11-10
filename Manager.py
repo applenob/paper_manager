@@ -59,7 +59,7 @@ def refresh():
         # if the paper was moved, update the paper path info
         elif old_path != papers_name_now[old_name]:
             cursor.execute("UPDATE papers SET path = ? where paper_name = ?"
-                           , (old_name, papers_name_now[old_name]))
+                           , (papers_name_now[old_name], old_name))
     old_paper_names = cursor.execute("SELECT paper_name FROM  papers").fetchall()
     old_paper_names = [rec[0] for rec in old_paper_names]
     for now_paper in papers_name_now.keys():
