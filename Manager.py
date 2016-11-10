@@ -199,7 +199,7 @@ def open_paper_by_num(num_s):
         if sys.platform.startswith('linux'):
             os.system("xdg-open {} > log.txt 2>&1 &".format(results[0]))
         else:
-            print color.red("only support linux platform now !")
+            print color.red("open file only support linux platform now !")
 
 
 def query_by_nums(num_s):
@@ -238,7 +238,7 @@ def edit_one_paper(id_num):
         if paper_tags == '':
             paper_tags = papers[0][3]
         if read == '':
-            paper_ug = papers[0][5]
+            read = papers[0][5]
         update_one(papers[0][0], paper_im, paper_ug, paper_tags, read)
     else:
         print color.red("paper id num equals {} dose not exist!".format(id_num))
