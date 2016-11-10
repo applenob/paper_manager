@@ -5,6 +5,7 @@ import cPickle as Pkl
 import sqlite3
 from datetime import date
 import cmd
+import sys
 
 
 color = Colored()
@@ -166,6 +167,15 @@ def query_by_tags(tags_s):
         print color.red("find nothing !")
 
 
+def print_path_by_nums(num_s):
+    results = query_path_by_nums(num_s)
+    if len(results) > 0:
+        for res in results:
+            print res
+    else:
+        print color.red("find nothing !")
+
+
 def query_path_by_nums(num_s):
     results = []
     nums = num_s.strip().split(' ')
@@ -175,11 +185,21 @@ def query_path_by_nums(num_s):
             if len(recs) > 0:
                 for rec in recs:
                     results.append(rec[4])
-    if len(results) > 0:
-        for res in results:
-            print res
-    else:
+    return results
+
+
+def open_paper_by_num(num_s):
+    results = query_path_by_nums(num_s)
+    if len(results) == 0:
         print color.red("find nothing !")
+    elif len(results) > 1:
+        print color.red("too much nums, please input one id num !")
+    else:
+        # open paper by system default software, only support linux platform now
+        if sys.platform.startswith('linux'):
+            os.system("xdg-open {} > log.txt 2>&1 &".format(results[0]))
+        else:
+            print color.red("only support linux platform now !")
 
 
 def query_by_nums(num_s):
@@ -263,6 +283,7 @@ sbt   search by tags, like (sbt tag1 tg2)
 sbn   search by id nums, like (sbn 1 2)
 edit  edit one paper info by paper id, like (edit 1)
 path  find path by paper id, like (path 1 2)
+open  open paper to read by id, like (open 1)
 help  help info
 quit  exit the manager
             '''
@@ -306,10 +327,16 @@ quit  exit the manager
               "use 'all' or 'tags' to see the id of your paper."
 
     def do_path(self, arg):
-        query_path_by_nums(arg)
+        print_path_by_nums(arg)
 
     def help_path(self):
         print "find path by paper id, like (path 1 2)"
+
+    def do_open(self, arg):
+        open_paper_by_num(arg)
+
+    def help_open(self):
+        print "open paper to read by id, like (open 1)"
 
     def do_quit(self, arg):
         print color.yellow("Bye ...")

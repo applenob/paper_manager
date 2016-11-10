@@ -16,6 +16,7 @@ sbt   search by tags, like (sbt tag1 tg2)
 sbn   search by id nums, like (sbn 1 2)
 edit  edit one paper info by paper id, like (edit 1)
 path find path by paper id, like (path 1 2)
+open  open paper to read by id, like (open 1)
 help  help info
 quit  exit the manager
 ```
