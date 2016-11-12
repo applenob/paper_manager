@@ -5,3 +5,4 @@ test.*
 *.db
 *_test.py
 *.txt
+pic_logo.py

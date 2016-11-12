@@ -273,8 +273,20 @@ class MyCmd(cmd.Cmd):
     def __init__(self):
         cmd.Cmd.__init__(self)
         self.prompt = '(manager)>'
-        self.intro = '''
-Paper Manager Usage：
+        self.intro = color.yellow('''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%''')+\
+            color.cyan('''
+%%%      %%%%    %%%%%%%    %%
+%%%%   %%%  %%%   %%%%%%   %%%
+%%%%   %%%  .%%   -%%%% .  %%%
+%%%%   %%%  %%% %  %%%.=.  %%%
+%%%%      -%%%% %   %% %.  %%%
+%%%%   %%%%%%%% %%  = %%.  %%%
+%%%%   %%%%%%%% %%%  %%%.  %%%
+%%%%   %%%%%%%% %%%  %%%   %%%
+''')+\
+color.yellow('''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n''')+\
+color.red('''Paper Manager Usage：''')+\
+'''
 ^---^ ^---^ ^---^ ^---^ ^---^
 rec   recommend the papers according to urgency and importance
 all   show all the papers info
