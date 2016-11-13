@@ -197,7 +197,9 @@ def open_paper_by_num(num_s):
     else:
         # open paper by system default software, only support linux platform now
         if sys.platform.startswith('linux'):
-            os.system("xdg-open {} > log.txt 2>&1 &".format(results[0].replace(' ', '\ ')))
+            file_path = '\\'.join(results[0])
+            # print file_path
+            os.system("xdg-open {} > log.txt 2>&1 &".format(file_path))
         else:
             print color.red("open file only support linux platform now !")
 
