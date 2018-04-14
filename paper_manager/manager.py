@@ -42,35 +42,43 @@ class Manager:
         is_new = False
         while True:
             if len(list(rep_dict.keys())) != 0:
-                print("Choose one of the repositories below or add a new repository, "
-                      "(if a new repository is needed, input a new name)")
+                print("Choose one of the repositories below or add a new repository. "
+                      "(first repository as default, if a new repository is needed, input a new name)")
                 for one_rep in rep_dict:
                     print(one_rep, " : ", rep_dict[one_rep][0], " type: ", rep_dict[one_rep][1])
             else:
-                print("No repository in your system now, please input a new name")
+                print(self.color.red("No repository in your system now, please input a new name"))
             rep_name = input().strip()
+            if rep_name == "":
+                if len(list(rep_dict.keys())) != 0:
+                    rep_name = list(rep_dict.keys())[0]
+                else:
+                    print(self.color.red("Please input a repository name !"))
             if rep_name in rep_dict:
                 self.user_config["all_repositories"] = rep_dict
                 rep_path, support_suffix = rep_dict[rep_name]
                 break
             else:
-                print("It's a new repository name, input the path of this repository,"
-                      "re-input repository name input 'back'")
+                print("It's a new repository name, input the path of this repository."
+                      "(current dir as default, re-input repository name input 'back')")
                 rep_path = input().strip()
                 if rep_path.strip() == "back":
                     continue
-                else:
-                    print("Input support suffix of this repository, seperate by space, eg:"
-                          "pdf mobi, re-input repository name input 'back'")
-                    support_suffix = input().strip()
-                    if support_suffix.strip() == "back":
-                        continue
-                    is_new = True
-                    rep_path = os.path.abspath(rep_path)
-                    support_suffix = support_suffix.split()
-                    rep_dict[rep_name] = [rep_path, support_suffix]
-                    self.user_config["all_repositories"] = rep_dict
-                    break
+                if rep_path == "":
+                    rep_path = "."
+                print("Input support suffix of this repository, seperate by space, lisk("
+                      "pdf mobi). (pdf as default, re-input repository name input 'back')")
+                support_suffix = input().strip()
+                if support_suffix.strip() == "back":
+                    continue
+                if support_suffix == "":
+                    support_suffix = "pdf"
+                is_new = True
+                rep_path = os.path.abspath(rep_path)
+                support_suffix = support_suffix.split()
+                rep_dict[rep_name] = [rep_path, support_suffix]
+                self.user_config["all_repositories"] = rep_dict
+                break
         self.cur_rep = Repository(rep_name, rep_path, support_suffix)
         if is_new:
             self.create_a_new_table_for_repository(rep_name)
@@ -91,23 +99,24 @@ class Manager:
         rep_dict = self.user_config.get("all_repositories", {})
         while True:
             if len(list(rep_dict.keys())) != 0:
-                print("Choose one of the repositories below to delete, give up input 'back'")
+                print("Choose one of the repositories below to delete. (give up input 'back')")
                 for one_rep in rep_dict:
                     print(one_rep, " : ", rep_dict[one_rep])
             else:
-                print("No repository in your system now!")
+                print(self.color.red("No repository in your system now!"))
                 return
             rep_name = input().strip()
             if rep_name in rep_dict:
-                print("confirm to delete repository {}? (y or n)".format(rep_name))
+                print(self.color.red("confirm to delete repository {}? (y or n)".format(rep_name)))
                 confirm = input().strip()
-                if confirm == "y":
+                if confirm == "y" or confirm == "":
                     del rep_dict[rep_name]
                     self.user_config["all_repositories"] = rep_dict
                     sql_drop = 'drop table {}'.format(rep_name)
                     self.cursor.execute(sql_drop)
                     if rep_name == self.cur_rep.name:
                         self.select_repository()
+                    print(self.color.red("repository: {} deleted!"))
                     return
                 else:
                     continue
@@ -196,7 +205,8 @@ class Manager:
     def recommend_papers(self):
         """select papers i can read for the sake of importance and urgency"""
         rec_papers = self.cursor.execute(
-            "SELECT * FROM {} WHERE importance!='' AND urgency!='' AND read='n' ORDER BY urgency DESC , importance DESC LIMIT 5 ".format(self.cur_rep.name)).fetchall()
+            "SELECT * FROM {} WHERE importance!='' AND urgency!='' AND read='n' ORDER BY urgency DESC , importance DESC LIMIT 5 ".format(
+                self.cur_rep.name)).fetchall()
         if len(rec_papers) > 0:
             self.print_papers(rec_papers)
 
@@ -220,7 +230,8 @@ class Manager:
         tags = tags_s.strip().split(' ')
         if len(tags) > 0:
             for tag in tags:
-                recs = self.cursor.execute("select * from {} where tags like '%{}%'".format(self.cur_rep.path, tag)).fetchall()
+                recs = self.cursor.execute(
+                    "select * from {} where tags like '%{}%'".format(self.cur_rep.path, tag)).fetchall()
                 if len(recs) > 0:
                     res_set = set()
                     for rec in recs:
@@ -306,16 +317,22 @@ class Manager:
             print(self.color.red("paper id num equals {} dose not exist!".format(id_num)))
 
     def get_on_paper_info_from_user(self):
-        paper_im = input(self.color.red("Please input the importance of this "
-                                        "paper (from 1 to 5):")).strip()
-        paper_ug = input(self.color.yellow("Please input the urgency of this "
-                                           "paper (from 1 to 5):")).strip()
+        paper_importance = input(self.color.red("Please input the importance of this "
+                                                "paper (from 1 to 5, 3 as default):")).strip()
+        if paper_importance == "":
+            paper_importance = "3"
+        paper_urgency = input(self.color.yellow("Please input the urgency of this "
+                                                "paper (from 1 to 5, 3 as default):")).strip()
+        if paper_urgency == "":
+            paper_urgency = "3"
         paper_tags = input(self.color.blue("Please input the tags of this paper"
                                            " (split by space):")).strip()
         read = input(self.color.magenta("Is this paper has been read?"
-                                        " (y/n): ")).strip()
+                                        " (y/n, n as default): ")).strip()
+        if read == "":
+            read = "n"
         print()
-        return paper_im, paper_ug, paper_tags, read
+        return paper_importance, paper_urgency, paper_tags, read
 
     def quit_manager(self):
         # save user data
