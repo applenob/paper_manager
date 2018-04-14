@@ -237,7 +237,12 @@ class Manager:
                     for rec in recs:
                         res_set.add(rec)
                     sets.append(res_set)
-        results = reduce(lambda x, y: x & y, sets)
+        results = set()
+        if len(sets) > 0:
+            results = sets[0]
+            if len(sets) > 1:
+                for one_set in sets[1:]:
+                    results = results & one_set
         if len(results) > 0:
             self.print_papers(results)
         else:
