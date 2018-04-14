@@ -231,7 +231,7 @@ class Manager:
         if len(tags) > 0:
             for tag in tags:
                 recs = self.cursor.execute(
-                    "select * from {} where tags like '%{}%'".format(self.cur_rep.path, tag)).fetchall()
+                    "select * from {} where tags like '%{}%'".format(self.cur_rep.name, tag)).fetchall()
                 if len(recs) > 0:
                     res_set = set()
                     for rec in recs:
