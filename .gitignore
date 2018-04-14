@@ -12,5 +12,5 @@ pic_logo.py
 out_main.py
 user*.json
 build
-
+MANIFEST.in
 

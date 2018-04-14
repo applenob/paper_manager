@@ -1,0 +1,2 @@
+include README.md LICENSE.txt requirements.txt # 包括 readme.rst, requirements.txt 三个文件
+# recursive-include ctmatching *.txt # 在 ctmatching 的所有文件和子文件夹中的文件中, 包括所有的 .txt 文件

@@ -55,8 +55,8 @@ except:
 
 PLATFORMS = ["Windows", "MacOS", "Unix"]
 CLASSIFIERS = [
-    "Development Status :: 1 - Beta",
-    "Intended Audience :: paper readers",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: Microsoft :: Windows",

@@ -5,9 +5,20 @@ A command-line manager programed in python, help with managing your local academ
 [Chinese blog address](http://www.jianshu.com/p/768db1472042)
 
 It support both python2.7 and python3.6 now.
+
 ## 2.Usage
 
-- 1.from code:
+- 1.download from PyPi
+```
+pip install paper_manager
+```
+
+run command:
+```
+paper_manager
+```
+
+- 2.from code:
 
 First, clone this repository to your computer.
 
