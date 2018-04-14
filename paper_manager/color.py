@@ -63,16 +63,3 @@ class Colored(object):
     def paint(self, color, string):
         # paint by color
         return eval("self.{}('{}')".format(color, string))
-
-if __name__ == '__main__':
-    color = Colored()
-    print color.red('I am red!')
-    print color.green('I am gree!')
-    print color.yellow('I am yellow!')
-    print color.blue('I am blue!')
-    print color.magenta('I am magenta!')
-    print color.cyan('I am cyan!')
-    print color.white('I am white!')
-    print color.white_green('I am white green!')
-    print color.white('I am white!') + color.magenta('I am magenta!')
-    print color.paint('cyan','I am white green!')

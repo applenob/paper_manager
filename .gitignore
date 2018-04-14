@@ -6,3 +6,11 @@ test.*
 *_test.py
 *.txt
 pic_logo.py
+.ipynb_checkpoints
+/dist/
+/*.egg-info
+out_main.py
+user*.json
+build
+
+
