@@ -63,3 +63,8 @@ class Colored(object):
     def paint(self, color, string):
         # paint by color
         return eval("self.{}('{}')".format(color, string))
+
+    def paint_by_num(self, num, string):
+        # paint by num
+        color_str = colors[num % len(colors)]
+        return eval("self.{}('{}')".format(color_str, string))

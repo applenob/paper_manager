@@ -20,16 +20,16 @@ paper_manager
 
 - 2.from code:
 
-First, clone this repository to your computer.
+First, clone the latest coed from this repository to your computer.
 
-Just run main.py:
- ```
- python main.py
- ```
-
-Or you can install this as a system command:
+Install this as a system command (**recommended**):
 ```
 python setup.py install
+```
+
+Or you can just run main.py:
+```
+python main.py
 ```
 
 After installation, you can run command `paper_manager` anywhere in you terminator.

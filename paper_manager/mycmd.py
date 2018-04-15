@@ -17,24 +17,20 @@ logo_str_2 = '''
 %%%%   %%%%%%%% %%%  %%%   %%%
 '''
 logo_str_3 = '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
-help_str = '''
-
-     select_rep select or create a repository to operate
-     delete_rep delete a repository
-     cur_rep    show current repository
-     refresh    refresh a repository
-     rec        recommend the papers according to urgency and importance
-     all        show all the papers info
-     tags       show all tags
-     sbt        search by tags, like (sbt tag1 tg2)
-     sbn        search by id nums, like (sbn 1 2)
-     edit       edit one paper info by paper id, like (edit 1)
-     path       find path by paper id, like (path 1 2)
-     open       open paper to read by id, like (open 1)
-     help       help info
-     quit       exit the manager
-     
-     '''
+help_list = [("select_rep", "select or create a repository to operate"),
+             ("delete_rep", "delete a repository"),
+             ("cur_rep", "show current repository"),
+             ("refresh", "refresh a repository"),
+             ("rec", "recommend the papers according to urgency and importance"),
+             ("all", "show all the papers info"),
+             ("tags", "show all tags"),
+             ("sbt", "search by tags, like (sbt tag1 tg2)"),
+             ("sbn", "search by id nums, like (sbn 1 2)"),
+             ("edit", "edit one paper info by paper id, like (edit 1)"),
+             ("path", "find path by paper id, like (path 1 2)"),
+             ("open", "open paper to read by id, like (open 1)"),
+             ("help", "help info"),
+             ("quit", "exit the manager")]
 
 
 class MyCmd(cmd.Cmd):
@@ -45,10 +41,13 @@ class MyCmd(cmd.Cmd):
         self.color = Colored()
         self.manager = Manager(self.color)
         self.prompt = '(manager)>'
+        help_str = "\n" + "".join([self.color.paint_by_num(i, one[0]) +
+                                   "\t\t" + one[1] + "\n"
+                                   for i, one in enumerate(help_list)]) + "\n"
         self.intro = self.color.yellow(logo_str_1) + \
                      self.color.cyan(logo_str_2) + \
                      self.color.yellow(logo_str_3 + "\n") + \
-                     self.color.red('''Paper Manager Usage：''') + help_str
+                     self.color.red('''Paper Manager Usage：\n''') + help_str
         self.manager.refresh()
 
     def do_select_rep(self, arg):
@@ -64,9 +63,10 @@ class MyCmd(cmd.Cmd):
         print("delete a repository")
 
     def do_cur_rep(self, arg):
-        print("current repository, name:", self.manager.cur_rep.name,
-              " path:", self.manager.cur_rep.path,
-              " support_suffix:", self.manager.cur_rep.support_suffix)
+        print("current repository, name:",
+              self.color.red(self.manager.cur_rep.name),
+              ", path:", self.color.yellow(self.manager.cur_rep.path),
+              ", support_suffix:", self.color.green(self.manager.cur_rep.support_suffix))
 
     def help_cur_rep(self):
         print("show current repository")

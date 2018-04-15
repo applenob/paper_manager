@@ -16,8 +16,9 @@ from six.moves import input
 
 class Manager:
     def __init__(self, color):
-        self.db_path = "paper_manager.db"
-        self.user_config_path = "user_config.json"
+        self.code_dir = os.path.split(os.path.realpath(__file__))[0]
+        self.db_path = os.path.join(self.code_dir, "paper_manager.db")
+        self.user_config_path = os.path.join(self.code_dir, "user_config.json")
         self.paper_item_list = ['paper_name', 'importance',
                                 'urgency', 'tags', 'path',
                                 'read', 'date', 'id']
@@ -42,10 +43,12 @@ class Manager:
         is_new = False
         while True:
             if len(list(rep_dict.keys())) != 0:
-                print("Choose one of the repositories below or add a new repository. "
-                      "(first repository as default, if a new repository is needed, input a new name)")
-                for one_rep in rep_dict:
-                    print(one_rep, " : ", rep_dict[one_rep][0], " type: ", rep_dict[one_rep][1])
+                print(self.color.cyan("Choose,"), "one of the repositories below or add a new repository. ",
+                      self.color.yellow("(first repository as default, "
+                                        "if a new repository is needed, input a new name)"))
+                for i, one_rep in enumerate(rep_dict):
+                    print(self.color.paint_by_num(i, one_rep), " : ", rep_dict[one_rep][0], " type: ",
+                          rep_dict[one_rep][1])
             else:
                 print(self.color.red("No repository in your system now, please input a new name"))
             rep_name = input().strip()
@@ -59,15 +62,18 @@ class Manager:
                 rep_path, support_suffix = rep_dict[rep_name]
                 break
             else:
-                print("It's a new repository name, input the path of this repository."
-                      "(current dir as default, re-input repository name input 'back')")
+                print("It's a", self.color.cyan("new repository name,"), "input the ",
+                      self.color.cyan("path of this repository."),
+                      self.color.yellow("(current dir as default, re-input repository name input 'back')"))
                 rep_path = input().strip()
                 if rep_path.strip() == "back":
                     continue
                 if rep_path == "":
                     rep_path = "."
-                print("Input support suffix of this repository, seperate by space, lisk("
-                      "pdf mobi). (pdf as default, re-input repository name input 'back')")
+                print("Input ", self.color.cyan("support suffix "),
+                      "of this repository, seperate by space, like:",
+                      self.color.cyan("(pdf mobi)"),
+                      self.color.yellow("(pdf as default, re-input repository name input 'back')"))
                 support_suffix = input().strip()
                 if support_suffix.strip() == "back":
                     continue
@@ -99,7 +105,9 @@ class Manager:
         rep_dict = self.user_config.get("all_repositories", {})
         while True:
             if len(list(rep_dict.keys())) != 0:
-                print("Choose one of the repositories below to delete. (give up input 'back')")
+                print("Choose one of the repositories below to ",
+                      self.color.red("delete!"),
+                      self.color.yellow("(give up input 'back')"))
                 for one_rep in rep_dict:
                     print(one_rep, " : ", rep_dict[one_rep])
             else:
@@ -107,7 +115,8 @@ class Manager:
                 return
             rep_name = input().strip()
             if rep_name in rep_dict:
-                print(self.color.red("confirm to delete repository {}? (y or n)".format(rep_name)))
+                print(self.color.red("confirm to delete repository {}? ".format(rep_name),
+                                     self.color.yellow("(y or n)")))
                 confirm = input().strip()
                 if confirm == "y" or confirm == "":
                     del rep_dict[rep_name]
@@ -123,7 +132,7 @@ class Manager:
             elif rep_name.strip() == "back":
                 return
             else:
-                print("It's a new repository name, re-input again!")
+                print(self.color.red("It's a new repository name, re-input again!"))
                 continue
 
     def refresh(self):
@@ -221,7 +230,7 @@ class Manager:
                     tag_set.add(tag)
         tag_s = 'All Tags: \n'
         for i, tag in enumerate(tag_set):
-            tag_s += self.color.paint(colors[i % len(colors)], tag) + ' '
+            tag_s += self.color.paint_by_num(i, tag) + ' '
         print(tag_s)
 
     def query_by_tags(self, tags_s):
@@ -322,18 +331,22 @@ class Manager:
             print(self.color.red("paper id num equals {} dose not exist!".format(id_num)))
 
     def get_on_paper_info_from_user(self):
-        paper_importance = input(self.color.red("Please input the importance of this "
-                                                "paper (from 1 to 5, 3 as default):")).strip()
+        paper_importance = input("Please input" +
+                                 self.color.red(" the importance ") + "of this paper" +
+                                 self.color.yellow(" (from 1 to 5, 3 as default):")).strip()
         if paper_importance == "":
             paper_importance = "3"
-        paper_urgency = input(self.color.yellow("Please input the urgency of this "
-                                                "paper (from 1 to 5, 3 as default):")).strip()
+        paper_urgency = input("Please input" +
+                              self.color.red(" the urgency ") + "of this paper" +
+                              self.color.yellow(" (from 1 to 5, 3 as default):")).strip()
         if paper_urgency == "":
             paper_urgency = "3"
-        paper_tags = input(self.color.blue("Please input the tags of this paper"
-                                           " (split by space):")).strip()
-        read = input(self.color.magenta("Is this paper has been read?"
-                                        " (y/n, n as default): ")).strip()
+        paper_tags = input("Please input" +
+                           self.color.blue(" the tags ") + "of this paper" +
+                           self.color.yellow(" (split by space):")).strip()
+        read = input("Is this paper" +
+                     self.color.magenta(" has been read?") +
+                     self.color.yellow(" (y/n, n as default): ")).strip()
         if read == "":
             read = "n"
         print()
